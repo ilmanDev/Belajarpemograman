@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TechNews by ilman • Belajar Pemograman</title>
+  <meta name="description" content="Website berita pemrograman: HTML, CSS, dan JavaScript – contoh lengkap tanpa framework." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #10172a;
+      --panel-2: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --brand: #60a5fa;
+      --brand-2: #34d399;
+      --border: #1f2937;
+      --accent: #272f45;
+      --card: #0f172a;
+      --shadow: 0 10px 30px rgba(2, 6, 23, .35);
+      --radius: 16px;
+    }
+    .light {
+      --bg: #f7fafc;
+      --panel: #ffffff;
+      --panel-2: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --brand: #2563eb;
+      --brand-2: #059669;
+      --border: #e2e8f0;
+      --accent: #f1f5f9;
+      --card: #ffffff;
+      --shadow: 0 10px 30px rgba(15, 23, 42, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(180deg, var(--bg), #0a0f1e 40%, var(--bg));
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Layout */
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+    header.topbar {
+      position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px);
+      background: color-mix(in oklab, var(--panel) 80%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-inner { display: grid; grid-template-columns: 1fr auto auto; gap: 16px; align-items: center; padding: 16px 24px; }
+    .brand { display:flex; gap: 10px; align-items:center; text-decoration:none; color: var(--text); font-weight: 700; letter-spacing: .3px; }
+    .logo { display:grid; place-items:center; width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: var(--shadow); font-weight: 800; }
+
+    .searchbar { display:flex; gap: 10px; align-items:center; background: var(--accent); border:1px solid var(--border); border-radius: 999px; padding: 8px 14px; }
+    .searchbar input { background: transparent; border: 0; color: var(--text); outline: none; width: 220px; }
+    .searchbar .chip { background: var(--panel-2); border:1px solid var(--border); border-radius: 999px; padding: 6px 10px; font-size: 12px; color: var(--muted); cursor: default; }
+
+    .actions { display:flex; gap: 8px; }
+    .btn {
+      appearance: none; border:1px solid var(--border); background: var(--panel-2); color: var(--text);
+      padding: 10px 14px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: transform .08s ease, background .2s ease;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.primary { background: linear-gradient(135deg, var(--brand), var(--brand-2)); border-color: transparent; color: white; }
+    .btn.ghost { background: var(--accent); }
+
+    nav.filters { margin: 18px 24px; display:flex; gap: 8px; flex-wrap: wrap; }
+    .pill { padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--panel-2); color: var(--text); cursor: pointer; font-weight: 600; }
+    .pill[aria-pressed="true"] { background: var(--brand); border-color: transparent; color: white; }
+
+    main { display: grid; grid-template-columns: 3fr 1.2fr; gap: 24px; padding: 0 24px 24px; }
+    @media (max-width: 980px) { main { grid-template-columns: 1fr; } .topbar-inner { grid-template-columns: 1fr auto; grid-auto-flow: row; } }
+
+    /* Cards */
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); display:flex; flex-direction: column; }
+    .thumb { aspect-ratio: 16 / 9; background: linear-gradient(135deg, #1f2937, #0f172a); display:grid; place-items:center; font-weight: 800; letter-spacing: .2px; color: #a5b4fc; }
+    .body { padding: 14px; display:flex; flex-direction: column; gap: 10px; }
+    .meta { display:flex; gap: 10px; align-items:center; font-size: 12px; color: var(--muted); }
+    .tag { padding: 4px 8px; border-radius: 999px; background: var(--accent); color: var(--text); border:1px solid var(--border); font-weight: 700; font-size: 11px; letter-spacing: .5px; }
+    .title { margin: 0; font-size: 18px; line-height: 1.3; }
+    .excerpt { color: var(--muted); margin: 0; }
+    .card .row { display:flex; justify-content: space-between; align-items:center; gap: 12px; }
+
+    /* Sidebar */
+    .sidebar { display:flex; flex-direction: column; gap: 16px; }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+    .panel h3 { margin: 0 0 8px; }
+    .trend { display:grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; padding: 10px; border-radius: 12px; }
+    .trend:hover { background: var(--accent); }
+    .trend .rank { width: 64px; height: 64px; display:grid; place-items:center; border-radius: 12px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; font-weight: 800; }
+    .trend .t-title { margin: 0; font-size: 14px; }
+    .trend .t-meta { font-size: 12px; color: var(--muted); }
+
+    /* Pagination */
+    .pagination { display:flex; gap: 8px; justify-content: center; align-items:center; margin-top: 12px; }
+    .page-btn { border:1px solid var(--border); background: var(--panel-2); color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+    .page-btn[aria-current="true"] { background: var(--brand); color:#fff; border-color: transparent; }
+
+    /* Footer */
+    footer { padding: 24px; margin-top: 12px; border-top: 1px solid var(--border); color: var(--muted); text-align:center; }
+
+    /* Modal */
+    dialog.article-modal { width: min(880px, 92vw); border: 1px solid var(--border); border-radius: 16px; background: var(--panel); color: var(--text); box-shadow: var(--shadow); }
+    dialog::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur(3px); }
+    .modal-head { display:flex; justify-content: space-between; align-items:center; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .modal-body { padding: 16px; }
+    .modal-body h1 { margin-top: 0; }
+    .close { border: 1px solid var(--border); background: var(--panel-2); color: var(--text); border-radius: 10px; padding: 8px 12px; cursor:pointer; }
+
+    /* Utility */
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+  </style>
+</head>
+<body>
+  <header class="topbar" role="banner">
+    <div class="topbar-inner container">
+      <a class="brand" href="#" aria-label="Beranda TechNews">
+        <div class="logo" aria-hidden="true">TN</div>
+        <span>TechNews by ilman • Belajar Pemograman</span>
+      </a>
+
+      <form id="searchForm" class="searchbar" role="search" aria-label="Pencarian berita">
+        <input id="searchInput" type="search" placeholder="Cari berita…" autocomplete="off" />
+        <span class="chip" title="Gunakan / untuk fokus pencarian">/ fokus</span>
+      </form>
+
+      <div class="actions">
+        <button id="themeToggle" class="btn ghost" aria-pressed="false" aria-label="Toggle tema">🌙 Tema</button>
+        <button id="bookmarkView" class="btn" aria-label="Lihat bookmark">🔖 Bookmark</button>
+        <button id="resetFilters" class="btn ghost" aria-label="Reset filter">↺ Reset</button>
+      </div>
+    </div>
+
+    <nav id="filters" class="filters" aria-label="Filter kategori">
+      <button class="pill" data-cat="ALL" aria-pressed="true">Semua</button>
+      <button class="pill" data-cat="HTML">HTML</button>
+      <button class="pill" data-cat="CSS">CSS</button>
+      <button class="pill" data-cat="JavaScript">JavaScript</button>
+    </nav>
+  </header>
+
+  <main class="container" role="main">
+    <section aria-labelledby="news-heading">
+      <h2 id="news-heading" class="sr-only">Daftar Berita</h2>
+      <div id="grid" class="grid" aria-live="polite"></div>
+      <div id="pagination" class="pagination" role="navigation" aria-label="Pagination"></div>
+    </section>
+
+    <aside class="sidebar" aria-label="Sisi Kanan">
+      <section class="panel">
+        <h3>🔥 Trending</h3>
+        <div id="trending"></div>
+      </section>
+      <section class="panel">
+        <h3>📌 Bookmark Anda</h3>
+        <div id="bookmarksEmpty" style="color:var(--muted);">Belum ada bookmark. Klik ikon 🔖 pada kartu berita untuk menyimpan.</div>
+        <ul id="bookmarksList" style="list-style:none; padding-left:0; margin:0; display:grid; gap:10px;"></ul>
+      </section>
+      <section class="panel">
+        <h3>ℹ️ Tentang</h3>
+        <p>Contoh website berita pemrograman statis (HTML, CSS, JavaScript) dengan fitur: pencarian, filter kategori, trending, bookmark (localStorage), pagination, dan mode gelap/terang.</p>
+      </section>
+    </aside>
+  </main>
+
+  <footer>
+    @Copyright by ilman. &middot; © <span id="year"></span> TechNews by ilman.
+  </footer>
+
+  <dialog id="articleModal" class="article-modal" aria-label="Detail artikel">
+    <div class="modal-head">
+      <strong>Detail Artikel</strong>
+      <button class="close" data-close>✕ Tutup</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </dialog>
+
+  <template id="cardTpl">
+    <article class="card" data-id="">
+      <div class="thumb">ILUSTRASI</div>
+      <div class="body">
+        <div class="meta">
+          <span class="tag"></span>
+          <time></time>
+          <span class="views" title="Jumlah dibaca">👁️ 0</span>
+        </div>
+        <h3 class="title"></h3>
+        <p class="excerpt"></p>
+        <div class="row">
+          <button class="btn primary read-more">Baca</button>
+          <button class="btn ghost bookmark" title="Simpan untuk nanti">🔖 Simpan</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script>
+    // ======= Data Berita (contoh statis) =======
+    const articles = [
+      {
+        id: 1,
+        title: 'Panduan Semantic HTML5 untuk Aksesibilitas Modern',
+        category: 'HTML',
+        date: '2025-07-25',
+        excerpt: 'Pelajari elemen semantik seperti <header>, <main>, <section>, dan ARIA agar situs lebih ramah pembaca layar.',
+        content: `<p>Semantic HTML membantu mesin pencari dan teknologi bantu memahami struktur halaman. Gunakan <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;article&gt;</code>, dan <code>&lt;footer&gt;</code> sesuai peruntukannya. Tambahkan atribut ARIA <code>aria-label</code> atau <code>aria-labelledby</code> jika diperlukan.</p>
+        <ul><li>Gunakan heading berurutan (h1 → h2 → h3)</li><li>Sediakan teks alternatif untuk gambar</li><li>Pastikan kontras warna memadai</li></ul>`,
+        views: 245
+      },
+      {
+        id: 2,
+        title: 'Menguasai Flexbox: Layout Responsif Tanpa Pusing',
+        category: 'CSS',
+        date: '2025-06-21',
+        excerpt: 'Properti inti seperti display:flex, justify-content, align-items, dan gap yang memudahkan grid sederhana.',
+        content: `<p>Flexbox menyederhanakan penyusunan layout satu dimensi. Gunakan <code>gap</code> untuk jarak, dan manfaatkan <code>flex-wrap</code> untuk baris baru otomatis.</p>
+        <p>Untuk tata letak kompleks, kombinasikan dengan CSS Grid.</p>`,
+        views: 402
+      },
+      {
+        id: 3,
+        title: 'ES2025: Fitur JavaScript yang Perlu Anda Coba',
+        category: 'JavaScript',
+        date: '2025-05-12',
+        excerpt: 'Dari top-level await hingga Record & Tuple – lihat apa saja yang mempermudah penulisan kode modern.',
+        content: `<p>Standar JavaScript terus berkembang. Pastikan mengaktifkan transpiler bila perlu untuk kompatibilitas.</p>`,
+        views: 518
+      },
+      {
+        id: 4,
+        title: 'Checklist SEO Dasar untuk Situs HTML Statis',
+        category: 'HTML',
+        date: '2025-03-30',
+        excerpt: 'Optimasi title, meta description, struktur heading, dan sitemap sederhana.',
+        content: `<p>Meski statis, halaman HTML bisa SEO-friendly dengan meta tag tepat dan konten relevan.</p>`,
+        views: 180
+      },
+      {
+        id: 5,
+        title: 'Trik CSS Grid untuk Dashboard Modern',
+        category: 'CSS',
+        date: '2025-04-11',
+        excerpt: 'Gunakan grid-template-columns repeat, minmax, dan auto-fit untuk responsivitas cerdas.',
+        content: `<p>CSS Grid adalah solusi 2D. Mulai dari <code>display:grid</code>, tentukan track dengan <code>grid-template-columns</code>.</p>`,
+        views: 312
+      },
+      {
+        id: 6,
+        title: 'Fetch API + Async/Await: Pola Data Loading Sederhana',
+        category: 'JavaScript',
+        date: '2025-02-18',
+        excerpt: 'Contoh pola loading, error state, dan timeouts kecil agar UX tetap mulus.',
+        content: `<p>Gunakan <code>try...catch</code> untuk error handling, dan tampilkan indikator loading saat permintaan berlangsung.</p>`,
+        views: 270
+      },
+      {
+        id: 7,
+        title: 'Formulir Aksesibel: Validasi HTML5 + Pseudo-Class CSS',
+        category: 'HTML',
+        date: '2025-01-09',
+        excerpt: 'Manfaatkan atribut required, pattern, dan :invalid untuk umpan balik instan.',
+        content: `<p>Gabungkan validasi native browser dengan pesan kesalahan yang jelas dan ramah aksesibilitas.</p>`,
+        views: 165
+      },
+      {
+        id: 8,
+        title: 'Animasi Mikro dengan CSS: transition & keyframes',
+        category: 'CSS',
+        date: '2024-12-19',
+        excerpt: 'Animasi halus dapat meningkatkan persepsi kualitas aplikasi Anda.',
+        content: `<p>Gunakan <code>prefers-reduced-motion</code> untuk menghormati pengguna sensitif gerak.</p>`,
+        views: 198
+      },
+      {
+        id: 9,
+        title: 'Modularisasi Kode: ES Modules di Browser Modern',
+        category: 'JavaScript',
+        date: '2024-11-02',
+        excerpt: 'Pisahkan file JS, gunakan import/export untuk keteraturan proyek.',
+        content: `<p>Tag <code>&lt;script type="module"&gt;</code> memungkinkan modul native di browser modern.</p>`,
+        views: 221
+      },
+    ];
+
+    // ======= State =======
+    const state = {
+      query: '',
+      category: 'ALL',
+      page: 1,
+      perPage: 6,
+      showBookmarksOnly: false,
+    };
+
+    // ======= Helpers =======
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+    const fmtDate = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
+
+    function filterArticles() {
+      const q = state.query.trim().toLowerCase();
+      let list = [...articles];
+      if (state.showBookmarksOnly) {
+        const ids = getBookmarks();
+        list = list.filter(a => ids.includes(a.id));
+      }
+      if (state.category !== 'ALL') list = list.filter(a => a.category === state.category);
+      if (q) list = list.filter(a => (a.title + ' ' + a.excerpt + ' ' + a.category).toLowerCase().includes(q));
+      return list.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function paginate(list) {
+      const total = Math.max(1, Math.ceil(list.length / state.perPage));
+      if (state.page > total) state.page = total;
+      const start = (state.page - 1) * state.perPage;
+      return { total, slice: list.slice(start, start + state.perPage) };
+    }
+
+    function getBookmarks() {
+      try { return JSON.parse(localStorage.getItem('tn:bookmarks') || '[]'); } catch { return []; }
+    }
+    function setBookmarks(ids) { localStorage.setItem('tn:bookmarks', JSON.stringify(ids)); renderBookmarks(); }
+    function toggleBookmark(id) {
+      const ids = new Set(getBookmarks());
+      ids.has(id) ? ids.delete(id) : ids.add(id);
+      setBookmarks([...ids]);
+    }
+
+    // ======= Render =======
+    function render() {
+      const list = filterArticles();
+      const { total, slice } = paginate(list);
+
+      // Grid
+      const grid = $('#grid');
+      grid.innerHTML = '';
+      slice.forEach(a => grid.appendChild(renderCard(a)));
+
+      // Pagination
+      const pag = $('#pagination');
+      pag.innerHTML = '';
+      for (let i = 1; i <= total; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'page-btn';
+        btn.textContent = i;
+        btn.setAttribute('aria-current', i === state.page);
+        btn.addEventListener('click', () => { state.page = i; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        pag.appendChild(btn);
+      }
+
+      // Trending
+      renderTrending();
+
+      // Bookmark sidebar visibility
+      const ids = getBookmarks();
+      $('#bookmarksEmpty').style.display = ids.length ? 'none' : 'block';
+    }
+
+    function renderCard(a) {
+      const tpl = $('#cardTpl');
+      const node = tpl.content.firstElementChild.cloneNode(true);
+      node.dataset.id = a.id;
+      node.querySelector('.tag').textContent = a.category;
+      node.querySelector('time').textContent = fmtDate(a.date);
+      node.querySelector('.views').textContent = `👁️ ${a.views}`;
+      node.querySelector('.title').textContent = a.title;
+      node.querySelector('.excerpt').textContent = a.excerpt;
+
+      // Read more -> modal
+      node.querySelector('.read-more').addEventListener('click', () => openModal(a.id));
+
+      // Bookmark button
+      const bmBtn = node.querySelector('.bookmark');
+      const bookmarked = getBookmarks().includes(a.id);
+      updateBookmarkBtn(bmBtn, bookmarked);
+      bmBtn.addEventListener('click', () => {
+        toggleBookmark(a.id);
+        updateBookmarkBtn(bmBtn, getBookmarks().includes(a.id));
+      });
+
+      // Thumbnail label
+      node.querySelector('.thumb').textContent = a.category;
+
+      return node;
+    }
+
+    function updateBookmarkBtn(btn, bookmarked) {
+      btn.textContent = bookmarked ? '✅ Tersimpan' : '🔖 Simpan';
+      btn.ariaPressed = String(!!bookmarked);
+    }
+
+    function renderTrending() {
+      const container = $('#trending');
+      container.innerHTML = '';
+      [...articles]
+        .sort((a, b) => b.views - a.views)
+        .slice(0, 5)
+        .forEach((a, i) => {
+          const row = document.createElement('div');
+          row.className = 'trend';
+          row.innerHTML = `
+            <div class="rank">#${i + 1}</div>
+            <div>
+              <p class="t-title"><strong>${a.title}</strong></p>
+              <div class="t-meta">${a.category} · ${fmtDate(a.date)} · 👁️ ${a.views}</div>
+            </div>`;
+          row.addEventListener('click', () => openModal(a.id));
+          container.appendChild(row);
+        });
+    }
+
+    function renderBookmarks() {
+      const list = $('#bookmarksList');
+      list.innerHTML = '';
+      const ids = getBookmarks();
+      const found = articles.filter(a => ids.includes(a.id));
+      found.forEach(a => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${a.title}</strong><br><span style="color:var(--muted); font-size:12px;">${a.category} · ${fmtDate(a.date)}</span>`;
+        li.style.cursor = 'pointer';
+        li.addEventListener('click', () => openModal(a.id));
+        list.appendChild(li);
+      });
+      $('#bookmarksEmpty').style.display = found.length ? 'none' : 'block';
+    }
+
+    // ======= Modal =======
+    const modal = $('#articleModal');
+    function openModal(id) {
+      const a = articles.find(x => x.id === id);
+      if (!a) return;
+      a.views += 1; // hitung view sederhana
+      const body = $('#modalBody');
+      body.innerHTML = `
+        <div class="meta" style="margin-bottom:8px;">
+          <span class="tag">${a.category}</span>
+          <time>${fmtDate(a.date)}</time>
+          <span>👁️ ${a.views}</span>
+        </div>
+        <h1>${a.title}</h1>
+        ${a.content}
+      `;
+      modal.showModal();
+      renderTrending();
+      render();
+    }
+    modal.addEventListener('click', (e) => { if (e.target.hasAttribute('data-close') || e.target === modal) modal.close(); });
+
+    // ======= Events =======
+    $('#searchInput').addEventListener('input', (e) => { state.query = e.target.value; state.page = 1; render(); });
+    document.addEventListener('keydown', (e) => { if (e.key === '/') { e.preventDefault(); $('#searchInput').focus(); }});
+
+    // Filter pills
+    $$('#filters .pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        $$('#filters .pill').forEach(b => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        state.category = btn.dataset.cat;
+        state.page = 1;
+        state.showBookmarksOnly = false;
+        render();
+      });
+    });
+
+    // Reset filters
+    $('#resetFilters').addEventListener('click', () => {
+      state.query = '';
+      state.category = 'ALL';
+      state.page = 1;
+      state.showBookmarksOnly = false;
+      $('#searchInput').value = '';
+      $$('#filters .pill').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === 'ALL')));
+      render();
+    });
+
+    // Bookmark view
+    $('#bookmarkView').addEventListener('click', () => {
+      state.showBookmarksOnly = !state.showBookmarksOnly;
+      $('#bookmarkView').textContent = state.showBookmarksOnly ? '📚 Lihat Semua' : '🔖 Bookmark';
+      state.page = 1;
+      render();
+    });
+
+    // Theme toggle (persist)
+    const THEME_KEY = 'tn:theme';
+    function applyTheme(theme) {
+      document.body.classList.toggle('light', theme === 'light');
+      const isLight = document.body.classList.contains('light');
+      $('#themeToggle').textContent = isLight ? '☀️ Tema' : '🌙 Tema';
+      $('#themeToggle').setAttribute('aria-pressed', String(isLight));
+      localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
+    }
+    $('#themeToggle').addEventListener('click', () => {
+      const current = localStorage.getItem(THEME_KEY) || 'dark';
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      applyTheme(localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
+      renderBookmarks();
+      renderTrending();
+      render();
+      $('#year').textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>
